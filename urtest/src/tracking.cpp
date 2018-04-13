@@ -27,14 +27,14 @@ float q[3][6]= {{2.2,0,-1.57,0.1,0,1},
                };
 
 
-//float waypoint[4][6]={
-//  {1.658 , -1.0775, 2.3394, -1.261, 1.8668 ,0.00411},
-//  {2.3231 , -1.0775 , 1.3619 , -1.261, 1.8668 ,0.00411},
-//  {1.40595 , -1.0775 ,2.099, -1.261, 1.8668 ,0.00411},
-//  {2.0558 , -1.0775, 1.7072, -1.261, 1.8668 ,0.00411}
+float waypoint[4][6]={
+  {1.57 ,  -0.7, 0.5, 1.57, 1.8668 ,0},
+  {2.3231 , -1.0775 , 1.3619 , -1.261, 1.8668 ,0.00411},
+  {1.40595 , -1.0775 ,2.099, -1.261, 1.8668 ,0.00411},
+  {2.0558 , -1.0775, 1.7072, -1.261, 1.8668 ,0.00411}
 
-//};
-
+};
+/*
 float waypoint[4][6]={
   {1.658 , -1.0775, 2.3394, -1.261, 1.8668 ,0.00411},
   {2.3231 , -0.651 , 1.3619 , -0.7087, 2.5312 ,0.004910},
@@ -44,7 +44,7 @@ float waypoint[4][6]={
 };
 
 
-
+*/
 float desired_time[4]={2.0 , 3.0 ,6.0 ,8.0};
 //std::string colour[4] = {"Blue", "Red", "Orange", "Yellow"};
 std::string joint_names[6]= {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint","wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
@@ -54,14 +54,20 @@ void move(void){
 
 
 }
+apriltags2_ros::AprilTagDetectionArray tag_data;
+void apriltag_cb(const apriltags2_ros::AprilTagDetectionArray::ConstPtr& msg){
+   tag_data = *msg;
 
+}
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "ur5test");
   ros::NodeHandle nh ;
   actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> ac("arm_controller/follow_joint_trajectory", true);
+  ros::Subscriber sub = nh.subscribe("/tag_detections",10,apriltag_cb);
 
+  ros::Rate loop_rate(30);
   ROS_INFO("Starting ...");
   ROS_INFO("Waiting for action server to start.\n");
   ac.waitForServer(); //will wait for infinite time
@@ -70,7 +76,7 @@ int main(int argc, char **argv)
 
  while(ros::ok()){
    control_msgs::FollowJointTrajectoryGoal msg;
-     for(int k=0;k<4;k++)
+     for(int k=0;k<1;k++)
      {
        trajectory_msgs::JointTrajectoryPoint point;
        for(int i=0;i<6;i++){
@@ -85,6 +91,18 @@ int main(int argc, char **argv)
        msg.trajectory.joint_names.push_back(joint_names[j].c_str());
      }
      msg.trajectory.header.stamp = ros::Time::now();
+
+
+   if(tag_data.detections.size()){
+     std::cout<<std::endl;
+        std::cout << "x"<<tag_data.detections[0].pose.pose.pose.position.x<<std::endl;
+        std::cout << "y"<<tag_data.detections[0].pose.pose.pose.position.y<<std::endl;
+        std::cout << "z"<<tag_data.detections[0].pose.pose.pose.position.z<<std::endl;
+   }
+
+
+      ros::spinOnce();
+      loop_rate.sleep();
 
      ac.sendGoal(msg);
      while(!ac.waitForResult());

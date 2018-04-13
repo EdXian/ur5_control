@@ -8,8 +8,16 @@ project(urtest)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-
+    joint_state_publisher
+      moveit_core
+      moveit_msgs
+      moveit_planners_ompl
+      moveit_ros_move_group
+      moveit_ros_planning_interface
+      moveit_ros_visualization
+      robot_state_publisher
+    roscpp
+apriltags2_ros
 actionlib_msgs
 actionlib
 )
@@ -136,7 +144,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
  add_executable(ur5test src/ur5test.cpp)
-
+ add_executable(tracking src/tracking.cpp)
+  add_executable(move src/move.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -151,7 +160,12 @@ include_directories(
  target_link_libraries(ur5test
    ${catkin_LIBRARIES}
  )
-
+target_link_libraries(tracking
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(move
+  ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############
