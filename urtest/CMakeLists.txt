@@ -17,7 +17,6 @@ find_package(catkin REQUIRED COMPONENTS
       moveit_ros_visualization
       robot_state_publisher
     roscpp
-apriltags2_ros
 actionlib_msgs
 actionlib
 )

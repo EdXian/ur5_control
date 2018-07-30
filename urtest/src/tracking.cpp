@@ -11,7 +11,7 @@
 #include "trajectory_msgs/JointTrajectoryPoint.h"
 #include "string.h"
 #include "std_msgs/Float64MultiArray.h"
-#include "apriltags2_ros/AprilTagDetectionArray.h"
+
 
 trajectory_msgs::JointTrajectory trajectory;
 control_msgs::FollowJointTrajectoryGoal  goal;
@@ -54,18 +54,14 @@ void move(void){
 
 
 }
-apriltags2_ros::AprilTagDetectionArray tag_data;
-void apriltag_cb(const apriltags2_ros::AprilTagDetectionArray::ConstPtr& msg){
-   tag_data = *msg;
 
-}
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "ur5test");
   ros::NodeHandle nh ;
   actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> ac("arm_controller/follow_joint_trajectory", true);
-  ros::Subscriber sub = nh.subscribe("/tag_detections",10,apriltag_cb);
+
 
   ros::Rate loop_rate(30);
   ROS_INFO("Starting ...");
@@ -91,14 +87,6 @@ int main(int argc, char **argv)
        msg.trajectory.joint_names.push_back(joint_names[j].c_str());
      }
      msg.trajectory.header.stamp = ros::Time::now();
-
-
-   if(tag_data.detections.size()){
-     std::cout<<std::endl;
-        std::cout << "x"<<tag_data.detections[0].pose.pose.pose.position.x<<std::endl;
-        std::cout << "y"<<tag_data.detections[0].pose.pose.pose.position.y<<std::endl;
-        std::cout << "z"<<tag_data.detections[0].pose.pose.pose.position.z<<std::endl;
-   }
 
 
       ros::spinOnce();

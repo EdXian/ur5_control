@@ -11,7 +11,6 @@
 #include "trajectory_msgs/JointTrajectoryPoint.h"
 #include "string.h"
 #include "std_msgs/Float64MultiArray.h"
-#include "apriltags2_ros/AprilTagDetectionArray.h"
 
 trajectory_msgs::JointTrajectory trajectory;
 control_msgs::FollowJointTrajectoryGoal  goal;
